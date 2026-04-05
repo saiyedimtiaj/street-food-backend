@@ -126,6 +126,7 @@ export class UsersService {
           is_active: true,
         },
       });
+      // TODO: send email
 
       return user;
     } catch {
