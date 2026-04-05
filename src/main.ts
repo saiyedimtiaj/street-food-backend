@@ -3,9 +3,14 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
+import type { NestExpressApplication } from '@nestjs/platform-express';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+let cachedApp: NestExpressApplication;
+
+async function bootstrap(): Promise<NestExpressApplication> {
+  if (cachedApp) return cachedApp;
+
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // ─── CORS ───────────────────────────────────────────────────────────────────
   app.enableCors({
@@ -96,13 +101,27 @@ The cookie is set automatically when using a browser frontend.
   });
 
   // ─── Start Server ─────────────────────────────────────────────────────────────
-  const port = process.env.PORT || 3000;
-  await app.listen(port);
+  const port = process.env.PORT || 5000;
 
-  console.log(`\n🍜 Street Food Review System API is running`);
-  console.log(`   → Server:  http://localhost:${port}`);
-  console.log(`   → API:     http://localhost:${port}/api/v1`);
-  console.log(`   → Swagger: http://localhost:${port}/api/docs\n`);
+  if (!process.env.VERCEL) {
+    await app.listen(port);
+    console.log(`\n🍜 Street Food Review System API is running`);
+    console.log(`   → Server:  http://localhost:${port}`);
+    console.log(`   → API:     http://localhost:${port}/api/v1`);
+    console.log(`   → Swagger: http://localhost:${port}/api/docs\n`);
+  } else {
+    await app.init();
+  }
+
+  cachedApp = app;
+  return app;
 }
 
-bootstrap();
+const appPromise = bootstrap();
+
+// Vercel serverless handler
+export default async function handler(req: any, res: any) {
+  const app = await appPromise;
+  const instance = app.getHttpAdapter().getInstance();
+  instance(req, res);
+}
