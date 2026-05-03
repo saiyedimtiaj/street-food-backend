@@ -26,6 +26,7 @@ async function seed() {
   await prisma.review.deleteMany();
   await prisma.food.deleteMany();
   await prisma.storeGallery.deleteMany();
+  await prisma.storeComplaint.deleteMany();
   await prisma.storeClaim.deleteMany();
   await prisma.storeSuggestion.deleteMany();
   await prisma.store.deleteMany();
