@@ -12,12 +12,20 @@ async function bootstrap(): Promise<NestExpressApplication> {
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-  // ─── CORS ───────────────────────────────────────────────────────────────────
-  app.enableCors({
-    origin: true,
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  // ─── Raw CORS middleware — runs before guards so every response gets headers ──
+  app.use((req: any, res: any, next: any) => {
+    const origin = req.headers.origin;
+    if (origin) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type,Authorization,Accept');
+    }
+    if (req.method === 'OPTIONS') {
+      res.status(204).end();
+      return;
+    }
+    next();
   });
 
   // ─── Cookie Parser ───────────────────────────────────────────────────────────
