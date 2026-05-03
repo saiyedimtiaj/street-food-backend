@@ -19,6 +19,7 @@ import { FoodsModule } from './foods/foods.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { SuggestionsModule } from './suggestions/suggestions.module';
 import { ClaimsModule } from './claims/claims.module';
+import { ComplaintsModule } from './complaints/complaints.module';
 import { AdminModule } from './admin/admin.module';
 import { UploadsModule } from './uploads/uploads.module';
 
@@ -37,6 +38,7 @@ import { UploadsModule } from './uploads/uploads.module';
     ReviewsModule,
     SuggestionsModule,
     ClaimsModule,
+    ComplaintsModule,
     AdminModule,
   ],
   providers: [
