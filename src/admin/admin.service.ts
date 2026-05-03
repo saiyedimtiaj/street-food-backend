@@ -6,13 +6,14 @@ export class AdminService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getDashboardStats() {
-    const [totalUsers, totalStores, totalReviews, pendingSuggestions, pendingClaims, activeStores] =
+    const [totalUsers, totalStores, totalReviews, pendingSuggestions, pendingClaims, pendingComplaints, activeStores] =
       await Promise.all([
         this.prisma.user.count(),
         this.prisma.store.count(),
         this.prisma.review.count(),
         this.prisma.storeSuggestion.count({ where: { status: 'pending' } }),
         this.prisma.storeClaim.count({ where: { status: 'pending' } }),
+        this.prisma.storeComplaint.count({ where: { status: 'pending' } }),
         this.prisma.store.count({ where: { status: 'active' } }),
       ]);
 
@@ -22,6 +23,7 @@ export class AdminService {
       totalReviews,
       pendingSuggestions,
       pendingClaims,
+      pendingComplaints,
       activeStores,
     };
   }
